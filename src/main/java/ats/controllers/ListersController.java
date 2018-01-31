@@ -43,8 +43,7 @@ public class ListersController {
 				System.out.println("WRONG SECRET KEY");
 				return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
 						
-			}
-			
+			}		
 			if(req.getHeader("firstName") == null || req.getHeader("lastName") == null || req.getHeader("email") == null || req.getHeader("company") == null) {
 				responseMap.put(Constants.ERRORS, Errors.BAD_HEADER_REQUEST);
 				return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
@@ -53,8 +52,11 @@ public class ListersController {
 			String companyName = req.getHeader("company");
 			Company company = companyRepository.findByCompanyName(companyName);
 			if(company != null) {
-				Lister newLister = new Lister();
-				ListerId i = new ListerId(req.getHeader("firstName"), req.getHeader("lastName"), req.getHeader("email"));
+				ListerId id = new ListerId(req.getHeader("firstName"), req.getHeader("lastName"), req.getHeader("email"));
+				Lister newLister = new Lister(id);
+				newLister.setCompany(company);
+				listerRepository.save(newLister);
+				responseMap.put("Lister", newLister);
 				return new ResponseEntity<>(responseMap, HttpStatus.OK);			
 			}else {
 				responseMap.put(Constants.ERRORS, Errors.COMPANY_NOT_FOUND);

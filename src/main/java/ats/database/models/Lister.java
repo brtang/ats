@@ -38,6 +38,10 @@ public class Lister {
 		
 	}
 	
+	public Lister(ListerId id) {
+		this.listerId = id;
+	}
+
 	public ListerId getListerId() {
 		return listerId;
 	}
