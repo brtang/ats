@@ -14,6 +14,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import ats.database.models.ids.ListerId;
+
 @Entity
 @Table(name = "Lister")
 public class Lister {
@@ -56,60 +58,65 @@ public class Lister {
 	
 }
 
-@Embeddable
-class ListerId implements Serializable{
-	
-	@Column(name = "firstName")
-	private String firstName;
-	
-	@Column(name = "lastName")
-	private String lastName;
-	
-	@Column(name = "email")
-	private String email;
-	
-	public ListerId() {
-		
-	}
-
-	public String getFirstName() {
-		return firstName;
-	}
-
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
-	public String getLastName() {
-		return lastName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-	
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (!(o instanceof UserId)) return false;
-		ListerId that = (ListerId) o;
-		return Objects.equals(getFirstName(), that.getFirstName()) &&
-				Objects.equals(getLastName(), that.getLastName()) &&
-				Objects.equals(getEmail(), that.getEmail());
-	}
-	
-	@Override
-	public int hashCode() {
-		return Objects.hash(getFirstName(), getLastName(), getEmail());
-	}
-	
-	
-}
+//@Embeddable
+//class ListerId implements Serializable{
+//	
+//	@Column(name = "firstName")
+//	private String firstName;
+//	
+//	@Column(name = "lastName")
+//	private String lastName;
+//	
+//	@Column(name = "email")
+//	private String email;
+//	
+//	public ListerId() {
+//		
+//	}
+//	
+//	public ListerId(String firstName, String lastName, String email) {
+//		this.firstName = firstName;
+//		this.lastName = lastName;
+//		this.email = email;
+//	}
+//	
+//	public String getFirstName() {
+//		return firstName;
+//	}
+//
+//	public void setFirstName(String firstName) {
+//		this.firstName = firstName;
+//	}
+//
+//	public String getLastName() {
+//		return lastName;
+//	}
+//
+//	public void setLastName(String lastName) {
+//		this.lastName = lastName;
+//	}
+//
+//	public String getEmail() {
+//		return email;
+//	}
+//
+//	public void setEmail(String email) {
+//		this.email = email;
+//	}
+//	
+//	@Override
+//	public boolean equals(Object o) {
+//		if (this == o) return true;
+//		if (!(o instanceof ListerId)) return false;
+//		ListerId that = (ListerId) o;
+//		return Objects.equals(getFirstName(), that.getFirstName()) &&
+//				Objects.equals(getLastName(), that.getLastName()) &&
+//				Objects.equals(getEmail(), that.getEmail());
+//	}
+//	
+//	@Override
+//	public int hashCode() {
+//		return Objects.hash(getFirstName(), getLastName(), getEmail());
+//	}
+//		
+//}

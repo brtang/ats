@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import ats.constants.Constants;
 import ats.constants.Errors;
 import ats.database.models.Company;
+import ats.database.models.Lister;
+import ats.database.models.ids.ListerId;
 import ats.database.repositories.CompaniesRepository;
 import ats.database.repositories.ListersRepository;
 
@@ -35,10 +37,15 @@ public class ListersController {
 	public ResponseEntity<Object> createLister(HttpServletRequest req){
 		Map<String, Object> responseMap = new HashMap<String, Object>();
 		try {
+			// To Do: Store secret key in properties
+			if(req.getHeader("secretKey") == null || !req.getHeader("secretKey").equals("this")) {
+				// Log this attempt
+				System.out.println("WRONG SECRET KEY");
+				return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
+						
+			}
 			
-			System.out.println(req.getRemoteAddr());
-			
-			if(req.getHeader("firstName") == null || req.getHeader("lastName") == null || req.getHeader("email") == null) {
+			if(req.getHeader("firstName") == null || req.getHeader("lastName") == null || req.getHeader("email") == null || req.getHeader("company") == null) {
 				responseMap.put(Constants.ERRORS, Errors.BAD_HEADER_REQUEST);
 				return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
 			}
@@ -46,9 +53,9 @@ public class ListersController {
 			String companyName = req.getHeader("company");
 			Company company = companyRepository.findByCompanyName(companyName);
 			if(company != null) {
-				return new ResponseEntity<>(responseMap, HttpStatus.OK);
-				
-				
+				Lister newLister = new Lister();
+				ListerId i = new ListerId(req.getHeader("firstName"), req.getHeader("lastName"), req.getHeader("email"));
+				return new ResponseEntity<>(responseMap, HttpStatus.OK);			
 			}else {
 				responseMap.put(Constants.ERRORS, Errors.COMPANY_NOT_FOUND);
 				return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
