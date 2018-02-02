@@ -14,6 +14,8 @@ public class Constants {
 	}};
 	
 	public static final String ERRORS = "Errors";
+
+	public static final String LISTING = "Listing";
 	
 	
 	

@@ -24,7 +24,6 @@ public class Company implements Serializable{
 	@Column(name = "name")
 	private String companyName;
 	
-	
 	// The mappedBy attribute spcifies that the private Company company field in User
 	// owns the relationship and contains the foreign key for the query to find all users for a company
 	@OneToMany(mappedBy = "company")
@@ -32,6 +31,9 @@ public class Company implements Serializable{
 	
 	@OneToMany(mappedBy = "company")
 	private List<Listing> listings;
+	
+	@Column(name = "numListingsRemaining")
+	private int numListingsRemaining = 10;
 	
 	public Company(){
 		
@@ -46,6 +48,14 @@ public class Company implements Serializable{
 
 	public void setCompanyName(String companyName) {
 		this.companyName = companyName;
+	}
+	
+	public int getNumListingsRemaining() {
+		return numListingsRemaining;
+	}
+	
+	public void setNumListingsRemaining(int numListingsRemaining) {
+		this.numListingsRemaining = numListingsRemaining;
 	}
 	
 }

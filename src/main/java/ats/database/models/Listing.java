@@ -34,13 +34,15 @@ public class Listing implements Serializable{
 	@Column(name = "description")
 	private String description;
 	
+	@Column(name = "isActive")
+	private boolean isActive = true;
+	
 	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="company_name")
 	private Company company; 
 	
 	// Need multiple JoinColumn's because primary key of Lister is a composite key
 	@ManyToOne(fetch=FetchType.LAZY)
-//	@JoinColumn(name="lister")	
 	@JoinColumns({
 		@JoinColumn(name="lister_fname", referencedColumnName="firstName"),
 		@JoinColumn(name="lister_lname", referencedColumnName="lastName"),
@@ -54,5 +56,75 @@ public class Listing implements Serializable{
 	public Listing(){
 		
 	}
+	
+	public Listing(Company company) {
+		this.company = company;
+	}
+
+	public Date getEnd_date() {
+		return end_date;
+	}
+
+	public void setEnd_date(Date end_date) {
+		this.end_date = end_date;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public boolean isActive() {
+		return isActive;
+	}
+
+	public void setActive(boolean isActive) {
+		this.isActive = isActive;
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public Date getPost_date() {
+		return post_date;
+	}
+
+	public void setPost_date(Date post_date) {
+		this.post_date = post_date;
+	}
+
+	public Company getCompany() {
+		return company;
+	}
+
+	public void setCompany(Company company) {
+		this.company = company;
+	}
+
+	public Lister getLister() {
+		return lister;
+	}
+
+	public void setLister(Lister lister) {
+		this.lister = lister;
+	}
+
+	public List<Application> getApplications() {
+		return applications;
+	}
+
+	public void setApplications(List<Application> applications) {
+		this.applications = applications;
+	}
+
+	
 	
 }

@@ -34,6 +34,9 @@ public class Lister {
 	@OneToMany(mappedBy="lister")
 	private List<Listing> listings;
 	
+	@Column(name="canList")
+	private boolean canList = true;
+	
 	public Lister() {
 		
 	}
@@ -57,8 +60,14 @@ public class Lister {
 	public void setCompany(Company company) {
 		this.company = company;
 	}
-	
-	
+
+	public boolean isCanList() {
+		return canList;
+	}
+
+	public void setCanList(boolean canList) {
+		this.canList = canList;
+	}
 	
 }
 
