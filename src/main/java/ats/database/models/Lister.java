@@ -1,28 +1,26 @@
 package ats.database.models;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import ats.database.models.ids.ListerId;
-
 @Entity
 @Table(name = "Lister")
-public class Lister {
+public class Lister implements Serializable{
 	
-	@EmbeddedId
-	public ListerId listerId;
-	
+	@Id
+	@Column(name = "email")
+	private String email;
+		
 	// Specifies the User table does not contain a company column, but
 	// a company_name column with a foreign key on the @Id attribute of Company and creates a join to lazily fetch the company.
 	// Lazy fetching allows the fetching of a relationship to be deferred until it is accessed. 
@@ -31,8 +29,23 @@ public class Lister {
 	@JoinColumn(name="company_name")
 	private Company company;
 	
-	@OneToMany(mappedBy="lister")
-	private List<Listing> listings;
+//	@OneToMany(fetch=FetchType.EAGER)
+//	@JoinColumn(name= "id")
+//	private List<Listing> listings = new ArrayList<Listing>();
+//	
+//	public List<Listing> getListings() {
+//		return listings;
+//	}
+//
+//	public void setListings(List<Listing> listings) {
+//		this.listings = listings;
+//	}
+
+	@Column(name = "firstName")
+	private String firstName;
+	
+	@Column(name = "lastName")
+	private String lastName;
 	
 	@Column(name="canList")
 	private boolean canList = true;
@@ -41,16 +54,9 @@ public class Lister {
 		
 	}
 	
-	public Lister(ListerId id) {
-		this.listerId = id;
-	}
-
-	public ListerId getListerId() {
-		return listerId;
-	}
-
-	public void setListerId(ListerId listerId) {
-		this.listerId = listerId;
+	public Lister(Company company, String email) {
+		this.company = company;
+		this.email = email;
 	}
 
 	public Company getCompany() {
@@ -68,68 +74,30 @@ public class Lister {
 	public void setCanList(boolean canList) {
 		this.canList = canList;
 	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
 	
 }
 
-//@Embeddable
-//class ListerId implements Serializable{
-//	
-//	@Column(name = "firstName")
-//	private String firstName;
-//	
-//	@Column(name = "lastName")
-//	private String lastName;
-//	
-//	@Column(name = "email")
-//	private String email;
-//	
-//	public ListerId() {
-//		
-//	}
-//	
-//	public ListerId(String firstName, String lastName, String email) {
-//		this.firstName = firstName;
-//		this.lastName = lastName;
-//		this.email = email;
-//	}
-//	
-//	public String getFirstName() {
-//		return firstName;
-//	}
-//
-//	public void setFirstName(String firstName) {
-//		this.firstName = firstName;
-//	}
-//
-//	public String getLastName() {
-//		return lastName;
-//	}
-//
-//	public void setLastName(String lastName) {
-//		this.lastName = lastName;
-//	}
-//
-//	public String getEmail() {
-//		return email;
-//	}
-//
-//	public void setEmail(String email) {
-//		this.email = email;
-//	}
-//	
-//	@Override
-//	public boolean equals(Object o) {
-//		if (this == o) return true;
-//		if (!(o instanceof ListerId)) return false;
-//		ListerId that = (ListerId) o;
-//		return Objects.equals(getFirstName(), that.getFirstName()) &&
-//				Objects.equals(getLastName(), that.getLastName()) &&
-//				Objects.equals(getEmail(), that.getEmail());
-//	}
-//	
-//	@Override
-//	public int hashCode() {
-//		return Objects.hash(getFirstName(), getLastName(), getEmail());
-//	}
-//		
-//}

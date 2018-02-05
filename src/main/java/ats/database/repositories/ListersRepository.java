@@ -7,6 +7,6 @@ import org.springframework.data.repository.CrudRepository;
 import ats.database.models.Lister;
 
 public interface ListersRepository extends CrudRepository<Lister, Serializable>{
-	Lister findByListerIdEmail(String email);
+	Lister findByEmail(String email);
 	
 }

@@ -41,13 +41,8 @@ public class Listing implements Serializable{
 	@JoinColumn(name="company_name")
 	private Company company; 
 	
-	// Need multiple JoinColumn's because primary key of Lister is a composite key
-	@ManyToOne(fetch=FetchType.LAZY)
-	@JoinColumns({
-		@JoinColumn(name="lister_fname", referencedColumnName="firstName"),
-		@JoinColumn(name="lister_lname", referencedColumnName="lastName"),
-		@JoinColumn(name="lister_email", referencedColumnName="email")
-	})
+	@ManyToOne(fetch=FetchType.LAZY)	
+	@JoinColumn(name="email")
 	private Lister lister;
 	
 	@OneToMany(mappedBy="listing")
@@ -124,7 +119,5 @@ public class Listing implements Serializable{
 	public void setApplications(List<Application> applications) {
 		this.applications = applications;
 	}
-
-	
 	
 }

@@ -17,6 +17,8 @@ public class Constants {
 
 	public static final String LISTING = "Listing";
 	
-	
+	public static final String COMPANY = "Company";
+
+	public static final String LISTER = "Lister";	
 	
 }

@@ -1,11 +1,12 @@
 package ats.database.models;
 
 import java.io.Serializable;
-import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -26,12 +27,24 @@ public class Company implements Serializable{
 	
 	// The mappedBy attribute spcifies that the private Company company field in User
 	// owns the relationship and contains the foreign key for the query to find all users for a company
-	@OneToMany(mappedBy = "company")
-	private List<Lister> listers;
+//	@OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
+//	private List<Lister> listers;
+//	
+//	@OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
+//	private List<Listing> listings;
 	
-	@OneToMany(mappedBy = "company")
-	private List<Listing> listings;
+	@Column(name = "address")
+	private String address;
 	
+	@Column(name = "country")
+	private String country;
+	
+	@Column(name = "zipCode")
+	private int zipCode;
+	
+	@Column(name = "createCode")
+	private String createCode;
+		
 	@Column(name = "numListingsRemaining")
 	private int numListingsRemaining = 10;
 	
@@ -56,6 +69,30 @@ public class Company implements Serializable{
 	
 	public void setNumListingsRemaining(int numListingsRemaining) {
 		this.numListingsRemaining = numListingsRemaining;
+	}
+	public String getAddress() {
+		return address;
+	}
+	public void setAddress(String address) {
+		this.address = address;
+	}
+	public String getCountry() {
+		return country;
+	}
+	public void setCountry(String country) {
+		this.country = country;
+	}
+	public int getZipCode() {
+		return zipCode;
+	}
+	public void setZipCode(int zipCode) {
+		this.zipCode = zipCode;
+	}
+	public String getCreateCode() {
+		return createCode;
+	}
+	public void setCreateCode(String createCode) {
+		this.createCode = createCode;
 	}
 	
 }

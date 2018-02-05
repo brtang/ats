@@ -8,5 +8,6 @@ public class Errors {
 	public static final String INTERNAL_ERROR = "Internal Server error occured.";
 	public static final Object COMPANY_NOT_FOUND = "Company not found.";
 	public static final Object BAD_HEADER_REQUEST = "Incomplete headers.";
+	public static final Object LISTER_NOT_FOUND = "Lister not found";
 
 }
