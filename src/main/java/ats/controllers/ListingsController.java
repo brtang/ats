@@ -6,6 +6,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +30,8 @@ import ats.database.repositories.ListingsRepository;
 @RequestMapping("/{companyName}/{username}/listing")
 public class ListingsController {
 	
+	private static Logger logger = LoggerFactory.getLogger(ListingsController.class);
+	
 	@Autowired
 	private ListingsRepository listingsRepository;
 	
@@ -47,8 +51,7 @@ public class ListingsController {
 		try {
 			// To Do: Store secret key in properties
 			if(req.getHeader("secretKey") == null || !req.getHeader("secretKey").equals("this")) {
-				// Log this attempt
-				System.out.println("WRONG SECRET KEY");
+				logger.error("Invalid secretKey. Unauthorized attempt by IP: " + req.getLocalAddr());	
 				return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);		
 			}
 		
@@ -56,11 +59,9 @@ public class ListingsController {
 			if(company != null) {
 				if(company.getCreateCode().equals(createCode)) {
 					if(company.getNumListingsRemaining() > 0) {
-						Lister lister = null;
-//						Lister lister = listerRepository.findByCompanyNameAndUsername(companyName, username);
+						Lister lister = listerRepository.findByCompanyNameAndUsername(companyName, username);
 						if(lister != null) {
 							if(lister.isCanList()) {
-//								newListing.setCompany(company);
 								newListing.setLister(lister);
 								listingsRepository.save(newListing);
 								responseMap.put(Constants.LISTING, newListing);
@@ -89,8 +90,7 @@ public class ListingsController {
 				// Company does not exist
 				responseMap.put(Constants.ERRORS,"Company not found");
 				return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);		
-			}
-			
+			}			
 		}catch(Exception e) {
 			responseMap.put(Constants.ERRORS, Errors.INTERNAL_ERROR);
 			return new ResponseEntity<>(responseMap, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -111,25 +111,23 @@ public class ListingsController {
 			
 			Company company = companyRepository.findByCompanyName(companyName);
 			if(company != null) {
-				Lister lister = null;
-//				listerRepository.findByCompanyNameAndUsername(companyName, username);
+				Lister lister = listerRepository.findByCompanyNameAndUsername(companyName, username);
 				if(lister != null) {
-					List<Listing> listings = null;
-//					listingsRepository.findByListerUsernameAndCompanyCompanyName(username, companyName);
+					List<Listing> listings = listingsRepository.findByListerUsernameAndCompanyName(username, companyName);
 					responseMap.put(Constants.LISTING, listings);
 					return new ResponseEntity<>(responseMap, HttpStatus.OK);
 				}else {
 					// Lister not found
-					responseMap.put(Constants.ERRORS, "Lister not found");
+					responseMap.put(Constants.ERRORS, Errors.LISTER_NOT_FOUND);
 					return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);	
 				}			
 			}else {
 				// Company does not exist
-				responseMap.put(Constants.ERRORS,"Company not found");
+				responseMap.put(Constants.ERRORS, Errors.COMPANY_NOT_FOUND);
 				return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);	
-			}
-				
+			}	
 		}catch(Exception e) {
+			e.printStackTrace();
 			responseMap.put(Constants.ERRORS, Errors.INTERNAL_ERROR);
 			return new ResponseEntity<>(responseMap, HttpStatus.INTERNAL_SERVER_ERROR);
 		}

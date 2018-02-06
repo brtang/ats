@@ -39,7 +39,6 @@ public class Listing implements Serializable{
 	private boolean isActive = true;
 		
 	@ManyToOne(fetch=FetchType.LAZY)	
-//	@JoinColumn(name="username") 
 	@JoinColumns({
 		@JoinColumn(name = "username", referencedColumnName="username"),
 		@JoinColumn(name = "companyName", referencedColumnName="companyName") })
@@ -47,14 +46,13 @@ public class Listing implements Serializable{
 	
 	@OneToMany(mappedBy="listing")
 	private List<Application> applications;
+	
+	ArrayList<String> keyWords = new ArrayList<String>();
 
 	public Listing(){
 		
 	}
-	
-	ArrayList<String> keyWords = new ArrayList<String>();
-	
-	
+		
 	public ArrayList<String> getKeyWords() {
 		return keyWords;
 	}
@@ -62,10 +60,6 @@ public class Listing implements Serializable{
 	public void setKeyWords(ArrayList<String> keyWords) {
 		this.keyWords = keyWords;
 	}
-
-//	public Listing(Company company) {
-//		this.company = company;
-//	}
 
 	public Date getEnd_date() {
 		return end_date;
@@ -106,14 +100,6 @@ public class Listing implements Serializable{
 	public void setPost_date(Date post_date) {
 		this.post_date = post_date;
 	}
-
-//	public Company getCompany() {
-//		return company;
-//	}
-//
-//	public void setCompany(Company company) {
-//		this.company = company;
-//	}
 
 	public Lister getLister() {
 		return lister;

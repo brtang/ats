@@ -20,7 +20,6 @@ import ats.constants.Constants;
 import ats.constants.Errors;
 import ats.database.models.Company;
 import ats.database.models.Lister;
-import ats.database.models.ids.ListerId;
 import ats.database.repositories.CompaniesRepository;
 import ats.database.repositories.ListersRepository;
 
@@ -78,19 +77,16 @@ public class ListersController {
 //	}
 	
 	// POST to create a new Lister for a Company using Json
-	// Allows for updates with same emails
+	// Allows for updates with same usernames
 	@RequestMapping(value = "/{createCode}", method = RequestMethod.POST)
 	public ResponseEntity<Object> createLister(HttpServletRequest req, @PathVariable("companyName") String companyName, @PathVariable("username") String username, @PathVariable("createCode") String createCode, @RequestBody Lister newLister){
 		Map<String, Object> responseMap = new HashMap<String, Object>();
 		try {
 			// To Do: Store secret key in properties
 			if(req.getHeader("secretKey") == null || !req.getHeader("secretKey").equals("this")) {
-				// Log this attempt
 				logger.error("Invalid secretKey. Unauthorized attempt by IP: " + req.getLocalAddr());
-				System.out.println("WRONG SECRET KEY");
 				return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);			
 			}			
-			
 			Company company = companyRepository.findByCompanyName(companyName);
 			if(company != null) {
 				if(company.getCreateCode().equals(createCode)) {
@@ -100,14 +96,15 @@ public class ListersController {
 					responseMap.put(Constants.LISTER, newLister);
 					return new ResponseEntity<>(responseMap, HttpStatus.OK);	
 				}else {
+					// Invalid create code
 					responseMap.put(Constants.ERRORS, Errors.INVALID_CREATE_CODE);
 					return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);		
 				}			
 			}else {
+				// Company not found
 				responseMap.put(Constants.ERRORS, Errors.COMPANY_NOT_FOUND);
 				return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);	
-			}
-			
+			}		
 		}catch(Exception e) {
 			e.printStackTrace();
 			responseMap.put(Constants.ERRORS, Errors.INTERNAL_ERROR);
@@ -121,9 +118,7 @@ public class ListersController {
 		Map<String, Object> responseMap = new HashMap<String, Object>();
 		try {
 			if(req.getHeader("secretKey") == null || !req.getHeader("secretKey").equals("this")) {
-				// Log this attempt
 				logger.error("Invalid secretKey. Unauthorized attempt by IP: " + req.getLocalAddr());
-				System.out.println("WRONG SECRET KEY");
 				return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);			
 			}		
 			if(companyRepository.exists(companyName) ){

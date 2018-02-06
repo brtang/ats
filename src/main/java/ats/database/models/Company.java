@@ -2,12 +2,9 @@ package ats.database.models;
 
 import java.io.Serializable;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 
@@ -15,12 +12,6 @@ import javax.persistence.Table;
 @Table(name = "Company")
 public class Company implements Serializable{
 	
-	// Looks like this only works if its @Id
-//	@Id
-//	@GeneratedValue(strategy=GenerationType.AUTO)
-//	@Column(name = "id", updatable = false, nullable = false)
-//	private Integer id;
-
 	@Id
 	@Column(name = "name")
 	private String companyName;

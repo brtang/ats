@@ -5,7 +5,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,6 +81,7 @@ public class CompaniesController {
 				responseMap.put(Constants.COMPANY, newCompany);
 				return new ResponseEntity<>(responseMap, HttpStatus.OK);
 			}else {
+				// Company name already exists
 				logger.debug("/POST comapny: Company already exists for name: " + companyName);
 				responseMap.put(Constants.ERRORS, "Company with name " + companyName + " already exists.");
 				return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
@@ -103,6 +103,7 @@ public class CompaniesController {
 				responseMap.put(Constants.COMPANY, company);
 				return new ResponseEntity<>(responseMap, HttpStatus.OK);
 			}else {
+				// Company not found
 				responseMap.put(Constants.ERRORS, "Company with name " + companyName + " not found.");
 				return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
 			}						

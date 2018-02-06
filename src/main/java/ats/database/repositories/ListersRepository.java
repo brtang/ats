@@ -1,7 +1,6 @@
 package ats.database.repositories;
 
 import java.io.Serializable;
-import java.util.List;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -16,5 +15,4 @@ public interface ListersRepository extends CrudRepository<Lister, Serializable>{
 	
 	@Query("select l from Lister l where l.companyName.companyName = :companyName and l.username = :username")
 	Lister findByCompanyNameAndUsername(@Param("companyName") String companyName, @Param("username") String username);
-	
 }
