@@ -27,7 +27,7 @@ import ats.database.repositories.ListersRepository;
 import ats.database.repositories.ListingsRepository;
 
 @Controller
-@RequestMapping("/{companyName}/{username}/listing")
+@RequestMapping("/{companyName}")
 public class ListingsController {
 	
 	private static Logger logger = LoggerFactory.getLogger(ListingsController.class);
@@ -45,7 +45,7 @@ public class ListingsController {
 	// A lot of repetitive code that can be placed in an interceptor?
 	
 	// POST a new listing for an existing company and valid lister
-	@RequestMapping(value = "/{createCode}", method = RequestMethod.POST)
+	@RequestMapping(value = "/{username}/listing/{createCode}", method = RequestMethod.POST)
 	public ResponseEntity<Object> createListing(HttpServletRequest req, @PathVariable("companyName") String companyName,  @PathVariable("username") String username, @PathVariable("createCode") String createCode, @RequestBody Listing newListing){
 		Map<String, Object> responseMap = new HashMap<String, Object>();
 		try {
@@ -98,7 +98,7 @@ public class ListingsController {
 	}
 	
 	// GET a listing for a lister of a company
-	@RequestMapping(value = "", method = RequestMethod.GET)
+	@RequestMapping(value = "/{username}/listing", method = RequestMethod.GET)
 	public ResponseEntity<Object> getListing(HttpServletRequest req, @PathVariable("companyName") String companyName, @PathVariable("username") String username){
 		Map<String, Object> responseMap = new HashMap<String, Object>();
 		try {
@@ -133,4 +133,32 @@ public class ListingsController {
 		}
 	}
 	
+	// GET all listings by companyName
+	@RequestMapping(value = "/listing", method = RequestMethod.GET)
+	public ResponseEntity<Object> getListingByCompany(HttpServletRequest req, @PathVariable("companyName") String companyName){
+		Map<String, Object> responseMap = new HashMap<String, Object>();
+		try {
+			// To Do: Store secret key in properties
+			if(req.getHeader("secretKey") == null || !req.getHeader("secretKey").equals("this")) {
+				// Log this attempt
+				System.out.println("WRONG SECRET KEY");
+				return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);		
+			}
+			
+			Company company = companyRepository.findByCompanyName(companyName);
+			if(company != null) {
+				List<Listing> listings = listingsRepository.findByCompany(companyName);
+				responseMap.put(Constants.LISTING, listings);
+				return new ResponseEntity<>(responseMap, HttpStatus.OK);			
+			}else {
+				// Company does not exist
+				responseMap.put(Constants.ERRORS, Errors.COMPANY_NOT_FOUND);
+				return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);	
+			}						
+		}catch(Exception e) {
+			e.printStackTrace();
+			responseMap.put(Constants.ERRORS, Errors.INTERNAL_ERROR);
+			return new ResponseEntity<>(responseMap, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }
