@@ -1,15 +1,16 @@
 package ats.controllers;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -24,7 +25,7 @@ import ats.database.repositories.ListersRepository;
 import ats.database.repositories.ListingsRepository;
 
 @Controller
-@RequestMapping("/listing")
+@RequestMapping("/{companyName}/{username}/listing")
 public class ListingsController {
 	
 	@Autowired
@@ -36,67 +37,102 @@ public class ListingsController {
 	@Autowired
 	private ListersRepository listerRepository;
 	
-//	@RequestMapping(value = "", method = RequestMethod.POST)
-//	public ResponseEntity<Object> createListing(HttpServletRequest req, @RequestBody Listing listing){
-//		Map<String, Object> responseMap = new HashMap<String, Object>();
-//		try {
-//			// To Do: Store secret key in properties
-//			if(req.getHeader("secretKey") == null || !req.getHeader("secretKey").equals("this")) {
-//				// Log this attempt
-//				System.out.println("WRONG SECRET KEY");
-//				return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);		
-//			}
-//			
-////			Lister lister = listerRepository.findByListerIdEmail(listing.getLister().getListerId().getEmail());
-//			Lister lister = listerRepository.findByListerIdEmailAndListerIdFirstNameAndListerIdLastName(listing.getLister().getListerId().getEmail(), listing.getLister().getListerId().getFirstName(), listing.getLister().getListerId().getLastName());
-//			if(lister.isCanList()) {
-//				// Create new Listing 
-//				if(listing.getId() == null) {
-//						Company company = companyRepository.findByCompanyName(listing.getCompany().getCompanyName());
-//						if(company.getNumListingsRemaining() > 0) {
-//							company.setNumListingsRemaining(company.getNumListingsRemaining() - 1);
-//							companyRepository.save(company);
-//													
-//							listingsRepository.save(listing);
-//							responseMap.put(Constants.LISTING, listing);
-//							return new ResponseEntity<>(responseMap, HttpStatus.OK);
-//						}else {
-//							// Return no listings left error
-//							responseMap.put(Constants.ERRORS, Errors.BAD_HEADER_REQUEST);
-//							return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);		
-//						}				
-//				}else{
-//					// Update a listing
-//					if(listingsRepository.exists(listing.getId())){
-//						listingsRepository.save(listing);
-//						responseMap.put(Constants.LISTING, listing);
-//						return new ResponseEntity<>(responseMap, HttpStatus.OK);
-//					}else {
-//						// Return id not found error
-//						responseMap.put(Constants.ERRORS, "Listing not found. Bad ID");
-//						return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);		
-//					}
-//						
-//				}
-//					
-//			}else {
-//				// Return Lister is not valid to post listings error
-//				responseMap.put(Constants.ERRORS, Errors.BAD_HEADER_REQUEST);
-//				return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
-//			}
-//								
-//		}catch(NullPointerException e) {
-//			// Throw Invalid Lister or Company error
-//			responseMap.put(Constants.ERRORS, "Lister or Company does not exist");
-//			return new ResponseEntity<>(responseMap, HttpStatus.INTERNAL_SERVER_ERROR);
-//		}catch(DataIntegrityViolationException e) {
-//			// Cannot change company to a company that does not exist in db
-//			responseMap.put(Constants.ERRORS, "Cannot change company name to something that does nto exist");
-//			return new ResponseEntity<>(responseMap, HttpStatus.INTERNAL_SERVER_ERROR);
-//		}catch(Exception e) {
-//			responseMap.put(Constants.ERRORS, Errors.INTERNAL_ERROR);
-//			return new ResponseEntity<>(responseMap, HttpStatus.INTERNAL_SERVER_ERROR);
-//		}
-//	}
+	// TO DO: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	// A lot of repetitive code that can be placed in an interceptor?
+	
+	// POST a new listing for an existing company and valid lister
+	@RequestMapping(value = "/{createCode}", method = RequestMethod.POST)
+	public ResponseEntity<Object> createListing(HttpServletRequest req, @PathVariable("companyName") String companyName,  @PathVariable("username") String username, @PathVariable("createCode") String createCode, @RequestBody Listing newListing){
+		Map<String, Object> responseMap = new HashMap<String, Object>();
+		try {
+			// To Do: Store secret key in properties
+			if(req.getHeader("secretKey") == null || !req.getHeader("secretKey").equals("this")) {
+				// Log this attempt
+				System.out.println("WRONG SECRET KEY");
+				return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);		
+			}
 		
+			Company company = companyRepository.findByCompanyName(companyName);
+			if(company != null) {
+				if(company.getCreateCode().equals(createCode)) {
+					if(company.getNumListingsRemaining() > 0) {
+						Lister lister = null;
+//						Lister lister = listerRepository.findByCompanyNameAndUsername(companyName, username);
+						if(lister != null) {
+							if(lister.isCanList()) {
+//								newListing.setCompany(company);
+								newListing.setLister(lister);
+								listingsRepository.save(newListing);
+								responseMap.put(Constants.LISTING, newListing);
+								return new ResponseEntity<>(responseMap, HttpStatus.OK);
+							}else {
+								// Lister cannot list 
+								responseMap.put(Constants.ERRORS, "Lister cannot list");
+								return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);		
+							}					
+						}else {
+							// Lister not found
+							responseMap.put(Constants.ERRORS, "Lister not found");
+							return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);		
+						}
+					}else {
+						// Not enough listings remaining
+						responseMap.put(Constants.ERRORS, "Company does not have any listings left");
+						return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);		
+					}				
+				}else {
+					// Create code does not match
+					responseMap.put(Constants.ERRORS, "Invalid create code");
+					return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);		
+				}	
+			}else {
+				// Company does not exist
+				responseMap.put(Constants.ERRORS,"Company not found");
+				return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);		
+			}
+			
+		}catch(Exception e) {
+			responseMap.put(Constants.ERRORS, Errors.INTERNAL_ERROR);
+			return new ResponseEntity<>(responseMap, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	// GET a listing for a lister of a company
+	@RequestMapping(value = "", method = RequestMethod.GET)
+	public ResponseEntity<Object> getListing(HttpServletRequest req, @PathVariable("companyName") String companyName, @PathVariable("username") String username){
+		Map<String, Object> responseMap = new HashMap<String, Object>();
+		try {
+			// To Do: Store secret key in properties
+			if(req.getHeader("secretKey") == null || !req.getHeader("secretKey").equals("this")) {
+				// Log this attempt
+				System.out.println("WRONG SECRET KEY");
+				return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);		
+			}
+			
+			Company company = companyRepository.findByCompanyName(companyName);
+			if(company != null) {
+				Lister lister = null;
+//				listerRepository.findByCompanyNameAndUsername(companyName, username);
+				if(lister != null) {
+					List<Listing> listings = null;
+//					listingsRepository.findByListerUsernameAndCompanyCompanyName(username, companyName);
+					responseMap.put(Constants.LISTING, listings);
+					return new ResponseEntity<>(responseMap, HttpStatus.OK);
+				}else {
+					// Lister not found
+					responseMap.put(Constants.ERRORS, "Lister not found");
+					return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);	
+				}			
+			}else {
+				// Company does not exist
+				responseMap.put(Constants.ERRORS,"Company not found");
+				return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);	
+			}
+				
+		}catch(Exception e) {
+			responseMap.put(Constants.ERRORS, Errors.INTERNAL_ERROR);
+			return new ResponseEntity<>(responseMap, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
 }

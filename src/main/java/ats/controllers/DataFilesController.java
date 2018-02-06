@@ -23,7 +23,4 @@ public class DataFilesController {
 		return new ResponseEntity<>(responseMap, HttpStatus.OK);
 	}
 	
-	
-	
-	
 }

@@ -1,6 +1,7 @@
 package ats.database.models;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -36,13 +37,12 @@ public class Listing implements Serializable{
 	
 	@Column(name = "isActive")
 	private boolean isActive = true;
-	
-	@ManyToOne(fetch=FetchType.LAZY)
-	@JoinColumn(name="company_name")
-	private Company company; 
-	
+		
 	@ManyToOne(fetch=FetchType.LAZY)	
-	@JoinColumn(name="email")
+//	@JoinColumn(name="username") 
+	@JoinColumns({
+		@JoinColumn(name = "username", referencedColumnName="username"),
+		@JoinColumn(name = "companyName", referencedColumnName="companyName") })
 	private Lister lister;
 	
 	@OneToMany(mappedBy="listing")
@@ -52,9 +52,20 @@ public class Listing implements Serializable{
 		
 	}
 	
-	public Listing(Company company) {
-		this.company = company;
+	ArrayList<String> keyWords = new ArrayList<String>();
+	
+	
+	public ArrayList<String> getKeyWords() {
+		return keyWords;
 	}
+
+	public void setKeyWords(ArrayList<String> keyWords) {
+		this.keyWords = keyWords;
+	}
+
+//	public Listing(Company company) {
+//		this.company = company;
+//	}
 
 	public Date getEnd_date() {
 		return end_date;
@@ -96,13 +107,13 @@ public class Listing implements Serializable{
 		this.post_date = post_date;
 	}
 
-	public Company getCompany() {
-		return company;
-	}
-
-	public void setCompany(Company company) {
-		this.company = company;
-	}
+//	public Company getCompany() {
+//		return company;
+//	}
+//
+//	public void setCompany(Company company) {
+//		this.company = company;
+//	}
 
 	public Lister getLister() {
 		return lister;

@@ -3,31 +3,48 @@ package ats.database.models;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import ats.database.models.ids.ListerId;
+
+
 @Entity
 @Table(name = "Lister")
+@IdClass(ListerId.class)
 public class Lister implements Serializable{
 	
-	@Id
 	@Column(name = "email")
 	private String email;
-		
+	
+//	@Id
+//	@Column(name = "username")
+//	private String username;
+	
 	// Specifies the User table does not contain a company column, but
 	// a company_name column with a foreign key on the @Id attribute of Company and creates a join to lazily fetch the company.
 	// Lazy fetching allows the fetching of a relationship to be deferred until it is accessed. 
 	// Important to avoid unnecessary database accesses and avoid cost of building the objects if they are not needed
+	@Id
 	@ManyToOne(fetch=FetchType.LAZY)
-	@JoinColumn(name="company_name")
-	private Company company;
+	@JoinColumn(name="companyName")
+	private Company companyName;
+	
+	@Id
+	@Column(name="username")
+	private String username;
 	
 //	@OneToMany(fetch=FetchType.EAGER)
 //	@JoinColumn(name= "id")
@@ -55,16 +72,24 @@ public class Lister implements Serializable{
 	}
 	
 	public Lister(Company company, String email) {
-		this.company = company;
+		this.companyName = company;
 		this.email = email;
+	}
+	
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 	public Company getCompany() {
-		return company;
+		return companyName;
 	}
 
 	public void setCompany(Company company) {
-		this.company = company;
+		this.companyName = company;
 	}
 
 	public boolean isCanList() {
