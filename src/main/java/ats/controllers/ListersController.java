@@ -94,8 +94,8 @@ public class ListersController {
 			Company company = companyRepository.findByCompanyName(companyName);
 			if(company != null) {
 				if(company.getCreateCode().equals(createCode)) {
-//					newLister.setUsername(username);
-//					newLister.setCompany(company);
+					newLister.setUsername(username);
+					newLister.setCompany(company);
 					listerRepository.save(newLister);
 					responseMap.put(Constants.LISTER, newLister);
 					return new ResponseEntity<>(responseMap, HttpStatus.OK);	
@@ -104,11 +104,12 @@ public class ListersController {
 					return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);		
 				}			
 			}else {
-				responseMap.put(Constants.ERRORS, Errors.BAD_HEADER_REQUEST);
+				responseMap.put(Constants.ERRORS, Errors.COMPANY_NOT_FOUND);
 				return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);	
 			}
 			
 		}catch(Exception e) {
+			e.printStackTrace();
 			responseMap.put(Constants.ERRORS, Errors.INTERNAL_ERROR);
 			return new ResponseEntity<>(responseMap, HttpStatus.INTERNAL_SERVER_ERROR);
 		}	
@@ -126,16 +127,18 @@ public class ListersController {
 				return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);			
 			}		
 			if(companyRepository.exists(companyName) ){
-				Lister lister = listerRepository.findByUsername(username);
+				Lister lister = listerRepository.findByCompanyNameAndUsername(companyName, username);
 				if(lister != null && lister.getCompany().getCompanyName().equals(companyName)) {
 					responseMap.put(Constants.LISTER, lister);
 					return new ResponseEntity<>(responseMap, HttpStatus.OK);
 				}else{
+					// Lister not found for given username and companyName
 					responseMap.put(Constants.ERRORS, Errors.LISTER_NOT_FOUND);
 					return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
 				}
 			}else {
-				responseMap.put(Constants.ERRORS, "Company not found");
+				// Company not found
+				responseMap.put(Constants.ERRORS, Errors.COMPANY_NOT_FOUND);
 				return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);			
 			}	
 		}catch(Exception e) {

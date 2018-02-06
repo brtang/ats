@@ -25,14 +25,7 @@ import ats.database.models.ids.ListerId;
 @Table(name = "Lister")
 @IdClass(ListerId.class)
 public class Lister implements Serializable{
-	
-	@Column(name = "email")
-	private String email;
-	
-//	@Id
-//	@Column(name = "username")
-//	private String username;
-	
+			
 	// Specifies the User table does not contain a company column, but
 	// a company_name column with a foreign key on the @Id attribute of Company and creates a join to lazily fetch the company.
 	// Lazy fetching allows the fetching of a relationship to be deferred until it is accessed. 
@@ -45,6 +38,9 @@ public class Lister implements Serializable{
 	@Id
 	@Column(name="username")
 	private String username;
+	
+	@Column(name = "email")
+	private String email;
 	
 //	@OneToMany(fetch=FetchType.EAGER)
 //	@JoinColumn(name= "id")
@@ -70,12 +66,7 @@ public class Lister implements Serializable{
 	public Lister() {
 		
 	}
-	
-	public Lister(Company company, String email) {
-		this.companyName = company;
-		this.email = email;
-	}
-	
+			
 	public String getUsername() {
 		return username;
 	}
