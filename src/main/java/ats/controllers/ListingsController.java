@@ -73,7 +73,7 @@ public class ListingsController {
 							}					
 						}else {
 							// Lister not found
-							responseMap.put(Constants.ERRORS, "Lister not found");
+							responseMap.put(Constants.ERRORS, Errors.LISTER_NOT_FOUND);
 							return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);		
 						}
 					}else {
@@ -83,12 +83,12 @@ public class ListingsController {
 					}				
 				}else {
 					// Create code does not match
-					responseMap.put(Constants.ERRORS, "Invalid create code");
+					responseMap.put(Constants.ERRORS, Errors.INVALID_CREATE_CODE);
 					return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);		
 				}	
 			}else {
 				// Company does not exist
-				responseMap.put(Constants.ERRORS,"Company not found");
+				responseMap.put(Constants.ERRORS, Errors.COMPANY_NOT_FOUND);
 				return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);		
 			}			
 		}catch(Exception e) {

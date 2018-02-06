@@ -5,16 +5,19 @@ import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
 
 @Entity
 @Table(name = "User")
 public class User implements Serializable{
 	
 	@Id
-	@Column(name = "email")
+	@Column(name = "username")
+	private String username;
+	
+	@Column(name = "email", unique=true)
 	private String email;
 	
 	@Column(name = "firstName")
@@ -27,10 +30,18 @@ public class User implements Serializable{
 	private String address;
 	
 	@Column(name = "phone")
-	private Integer phone;
+	private Long phone;
 		
 	public User() {
 		
+	}
+	
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 	public String getAddress() {
@@ -41,11 +52,11 @@ public class User implements Serializable{
 		this.address = address;
 	}
 
-	public Integer getPhone() {
+	public Long getPhone() {
 		return phone;
 	}
 
-	public void setPhone(Integer phone) {
+	public void setPhone(Long phone) {
 		this.phone = phone;
 	}
 
@@ -72,8 +83,7 @@ public class User implements Serializable{
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	
-	
+		
 }
 
 

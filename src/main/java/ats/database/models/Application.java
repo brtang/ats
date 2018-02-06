@@ -48,8 +48,7 @@ public class Application {
 	@ManyToOne(fetch=FetchType.LAZY)
 //	@JoinColumn(name="user")
 	@JoinColumns({
-		@JoinColumn(name="user_fname", referencedColumnName="firstName"),
-		@JoinColumn(name="user_lname", referencedColumnName="lastName"),
+		@JoinColumn(name="user_uname", referencedColumnName="username"),
 		@JoinColumn(name="user_email", referencedColumnName="email")
 	})
 	private User user;

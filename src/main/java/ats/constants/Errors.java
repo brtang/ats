@@ -10,5 +10,6 @@ public class Errors {
 	public static final Object BAD_HEADER_REQUEST = "Incomplete headers.";
 	public static final Object LISTER_NOT_FOUND = "Lister not found";
 	public static final Object INVALID_CREATE_CODE = "Invalid create code";
+	public static final Object USER_ALREADY_EXISTS = "Username already exists";
 
 }
