@@ -13,5 +13,7 @@ public interface UsersRepository extends CrudRepository<User, Serializable>{
 	
 	@Query("select count(u) > 0 from User u where u.username = :username or u.email = :email")
 	boolean checkUsernameOrEmailExists(@Param("username") String username, @Param("email") String email);
+	
+	User findByUsername(String username);
 
 }

@@ -20,7 +20,7 @@ import ats.database.models.User;
 import ats.database.repositories.UsersRepository;
 
 @Controller
-@RequestMapping("users/{username}")
+@RequestMapping("/users")
 public class UsersController {
 	
 	@Autowired
@@ -28,11 +28,10 @@ public class UsersController {
 	
 	// POST a new user
 	@RequestMapping(value = "", method = RequestMethod.POST)
-	public ResponseEntity<Object> createUser(HttpServletRequest req, @PathVariable("username") String username, @RequestBody User newUser){
+	public ResponseEntity<Object> createUser(HttpServletRequest req, @RequestBody User newUser){
 		Map<String, Object> responseMap = new HashMap<String, Object>();
 		try {
-			if(!userRepository.checkUsernameOrEmailExists(username, newUser.getEmail())) {
-				newUser.setUsername(username);
+			if(!userRepository.checkUsernameOrEmailExists(newUser.getUsername(), newUser.getEmail())) {
 				userRepository.save(newUser);
 				responseMap.put(Constants.USER, newUser);
 				return new ResponseEntity<>(responseMap, HttpStatus.OK);	
@@ -47,6 +46,27 @@ public class UsersController {
 			return new ResponseEntity<>(responseMap, HttpStatus.INTERNAL_SERVER_ERROR);
 		}		
 	}
-			
+	
+	// GET a user 
+	@RequestMapping(value = "/{username}", method = RequestMethod.GET)
+	public ResponseEntity<Object> getUser(HttpServletRequest req, @PathVariable("username") String username){
+		Map<String, Object> responseMap = new HashMap<String, Object>();
+		try {
+			User user = userRepository.findByUsername(username);
+			if(user != null) {
+				responseMap.put(Constants.USER, user);
+				return new ResponseEntity<>(responseMap, HttpStatus.OK);
+			}else {
+				// User not found
+				responseMap.put(Constants.ERRORS, Errors.USER_NOT_FOUND);
+				return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
+			}
+						
+		}catch(Exception e) {
+			e.printStackTrace();
+			responseMap.put(Constants.ERRORS, Errors.INTERNAL_ERROR);
+			return new ResponseEntity<>(responseMap, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 
 }
