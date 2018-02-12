@@ -17,6 +17,8 @@ public class AppConfigUtils {
 	private String s3AccessKeyID;
 	@Value("${s3.secretAccessKey}")
 	private String s3SecretAccessKey;
+	@Value("${devFilePath}")
+	private String devFilePath;
 	
 	public String getS3Port() {
 		return s3Port;
@@ -29,6 +31,9 @@ public class AppConfigUtils {
 	}
 	public String getS3SecretAccessKey() {
 		return s3SecretAccessKey;
+	}
+	public String getDevFilePath() {
+		return devFilePath;
 	}
 	
 }
