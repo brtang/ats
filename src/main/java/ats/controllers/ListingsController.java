@@ -43,6 +43,7 @@ public class ListingsController {
 	
 	// TO DO: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// A lot of repetitive code that can be placed in an interceptor?
+	// To DO: Need a endpoint to PUT (update) listings from isActive to false
 	
 	// POST a new listing for an existing company and valid lister
 	@RequestMapping(value = "/{username}/listing/{createCode}", method = RequestMethod.POST)

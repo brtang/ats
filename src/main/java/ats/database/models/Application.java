@@ -1,5 +1,7 @@
 package ats.database.models;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -20,20 +22,11 @@ public class Application {
 	@Column(name = "id", updatable = false, nullable = false)
 	private Integer id;
 	
-	@Column(name = "firstName")
-	private String firstName;
+	@Column(name = "format")
+	private String format;
 	
-	@Column(name = "lastName")
-	private String lastName;
-	
-	@Column(name = "email")
-	private String email;
-	
-	@Column(name = "address")
-	private String address;
-	
-	@Column(name = "phone")
-	private Integer phone;
+	@Column(name = "upload_date")
+	private Date upload_date = new Date();
 	
 	@Column(name = "resumePath")
 	private String resumePath;
@@ -57,6 +50,22 @@ public class Application {
 	public Application() {
 		
 	}
+	
+	public Listing getListing() {
+		return listing;
+	}
+
+	public void setListing(Listing listing) {
+		this.listing = listing;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
 
 	public Integer getId() {
 		return id;
@@ -64,46 +73,6 @@ public class Application {
 
 	public void setId(Integer id) {
 		this.id = id;
-	}
-
-	public String getFirstName() {
-		return firstName;
-	}
-
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
-	public String getLastName() {
-		return lastName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public String getAddress() {
-		return address;
-	}
-
-	public void setAddress(String address) {
-		this.address = address;
-	}
-
-	public Integer getPhone() {
-		return phone;
-	}
-
-	public void setPhone(Integer phone) {
-		this.phone = phone;
 	}
 
 	public String getResumePath() {

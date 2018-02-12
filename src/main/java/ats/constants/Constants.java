@@ -21,6 +21,8 @@ public class Constants {
 
 	public static final String LISTER = "Lister";
 
-	public static final String USER = "User";	
+	public static final String USER = "User";
+
+	public static final String APPLICATION = "Application";	
 	
 }

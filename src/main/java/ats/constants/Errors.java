@@ -12,5 +12,6 @@ public class Errors {
 	public static final Object INVALID_CREATE_CODE = "Invalid create code";
 	public static final Object USER_ALREADY_EXISTS = "Username already exists";
 	public static final Object USER_NOT_FOUND = "User not found";
+	public static final Object LISTING_NOT_FOUND = "Listing not found";
 
 }

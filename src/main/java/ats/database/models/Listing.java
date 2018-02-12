@@ -36,6 +36,9 @@ public class Listing implements Serializable{
 	@Column(name = "end_date")
 	private Date end_date;
 	
+	@Column(name = "s3Path")
+	private String s3Path;
+	
 	@Column(name = "description")
 	private String description;
 	
@@ -48,8 +51,8 @@ public class Listing implements Serializable{
 		@JoinColumn(name = "companyName", referencedColumnName="companyName") })
 	private Lister lister;
 	
-	@OneToMany(mappedBy="listing")
-	private List<Application> applications;
+//	@OneToMany(mappedBy="listing")
+//	private List<Application> applications;
 	
 	ArrayList<String> keyWords = new ArrayList<String>();
 
@@ -113,12 +116,12 @@ public class Listing implements Serializable{
 		this.lister = lister;
 	}
 
-	public List<Application> getApplications() {
-		return applications;
-	}
-
-	public void setApplications(List<Application> applications) {
-		this.applications = applications;
-	}
+//	public List<Application> getApplications() {
+//		return applications;
+//	}
+//
+//	public void setApplications(List<Application> applications) {
+//		this.applications = applications;
+//	}
 	
 }
