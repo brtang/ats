@@ -71,12 +71,12 @@ public class ApplicationsController {
 					
 					MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) req; 
 					Map<String, MultipartFile> files = multiRequest.getFileMap(); 
-					MultipartFile file = new ArrayList<Entry<String, MultipartFile>>(files.entrySet()).get(0).getValue(); // First file in file map
+					MultipartFile file = new ArrayList<Entry<String, MultipartFile>>(files.entrySet()).get(0).getValue(); 
 					String filePath = s3utils.saveFileToLocal(new ByteArrayInputStream(file.getBytes()), file.getOriginalFilename(), appConfigUtils.getDevFilePath());
 					
 					// To Do: Check for extensions: docx, doc, pdf
 					
-					threadUtils.scheduleThread(newApp, listing, filePath);
+					threadUtils.scheduleThread(newApp, listing, filePath, s3utils);
 //					s3utils.pushToS3(fileName, "all", listing.getLister().getCompany().getCompanyName(), listing.getId(), appConfigUtils.getDevFilePath());
 					
 					responseMap.put(Constants.APPLICATION, newApp);

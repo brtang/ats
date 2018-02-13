@@ -29,7 +29,7 @@ public class S3Utils {
 				minioClient.makeBucket(appConfigUtils.getS3Bucket());
 				logger.info(appConfigUtils.getS3Bucket() + " created.");
 			}
-			minioClient.putObject(appConfigUtils.getS3Bucket(), companyName + "/" + listingId + "/" + location + "/" + fileName, path + "/" + fileName);	
+			minioClient.putObject(appConfigUtils.getS3Bucket(), companyName + "/" + listingId + "/" + location + "/" + fileName, path);	
 			logger.info("Successfully pushed " + companyName + "/" + listingId + "/" + location + "/" + fileName + " to S3 bucket.");
 			return true;
 		}catch(Exception e) {
