@@ -6,8 +6,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
+import org.aspectj.lang.annotation.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +30,7 @@ import ats.database.repositories.ListingsRepository;
 import ats.database.repositories.UsersRepository;
 import ats.utils.AppConfigUtils;
 import ats.utils.S3Utils;
+import ats.utils.ThreadUtils;
 
 
 @Controller
@@ -49,6 +52,9 @@ public class ApplicationsController {
 	@Autowired
 	private S3Utils s3utils;
 	
+	@Autowired
+	private ThreadUtils threadUtils;
+	
 	// POST a new application
 	@RequestMapping(value = "/{listingId}/application", method = RequestMethod.POST)
 	public ResponseEntity<Object> createApplication(HttpServletRequest req, @PathVariable("username") String username, @PathVariable("listingId") int listingId){
@@ -66,12 +72,12 @@ public class ApplicationsController {
 					MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) req; 
 					Map<String, MultipartFile> files = multiRequest.getFileMap(); 
 					MultipartFile file = new ArrayList<Entry<String, MultipartFile>>(files.entrySet()).get(0).getValue(); // First file in file map
-					String fileName = file.getOriginalFilename(); // First file's name
-					ByteArrayInputStream fileByteData = new ByteArrayInputStream(file.getBytes()); // First file's data
-					String filePath = s3utils.saveFileToLocal(fileByteData, fileName, appConfigUtils.getDevFilePath());
-					System.out.println(filePath);
-					System.out.println(newApp.getId());
-					s3utils.pushToS3(fileName, "all", listing.getLister().getCompany().getCompanyName(), listing.getId(), appConfigUtils.getDevFilePath());
+					String filePath = s3utils.saveFileToLocal(new ByteArrayInputStream(file.getBytes()), file.getOriginalFilename(), appConfigUtils.getDevFilePath());
+					
+					// To Do: Check for extensions: docx, doc, pdf
+					
+					threadUtils.scheduleThread(newApp, listing, filePath);
+//					s3utils.pushToS3(fileName, "all", listing.getLister().getCompany().getCompanyName(), listing.getId(), appConfigUtils.getDevFilePath());
 					
 					responseMap.put(Constants.APPLICATION, newApp);
 					return new ResponseEntity<>(responseMap, HttpStatus.OK);
