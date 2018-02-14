@@ -14,5 +14,6 @@ public class Errors {
 	public static final Object USER_NOT_FOUND = "User not found";
 	public static final Object LISTING_NOT_FOUND = "Listing not found";
 	public static final Object INVALID_FILE_UPLOAD = "Invalid file upload";
+	public static final String FAILED_TO_UPLOAD_TO_S3 = "Failed to upload to S3";
 
 }

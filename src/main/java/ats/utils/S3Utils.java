@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import ats.constants.Errors;
 import io.minio.MinioClient;
 
 @Service
@@ -19,8 +20,9 @@ public class S3Utils {
 	@Autowired
 	private AppConfigUtils appConfigUtils;
 	
-	public boolean pushToS3(String fileName, String location, String companyName, int listingId, String path) {
+	public String pushToS3(String fileName, String location, String companyName, int listingId, String path) {
 		try {
+			String s3Path = companyName + "/" + listingId + "/" + location + "/" + fileName;
 			logger.info("Attempting to connect to S3 client.");
 			MinioClient minioClient = new MinioClient(appConfigUtils.getS3Port(), appConfigUtils.getS3AccessKeyID(), appConfigUtils.getS3SecretAccessKey());
 			logger.info("Successfully connected to S3 client.");
@@ -29,14 +31,14 @@ public class S3Utils {
 				minioClient.makeBucket(appConfigUtils.getS3Bucket());
 				logger.info(appConfigUtils.getS3Bucket() + " created.");
 			}
-			minioClient.putObject(appConfigUtils.getS3Bucket(), companyName + "/" + listingId + "/" + location + "/" + fileName, path);	
+			minioClient.putObject(appConfigUtils.getS3Bucket(), s3Path, path);	
 			logger.info("Successfully pushed " + companyName + "/" + listingId + "/" + location + "/" + fileName + " to S3 bucket.");
-			return true;
+			return s3Path;
 		}catch(Exception e) {
 			// TO DO: Implement a retry mechanism
 			e.printStackTrace();
 			logger.error("Exception caught while pushing " + companyName + "/" + listingId + "/" + location + "/" + fileName + " to S3");
-			return false;
+			return Errors.FAILED_TO_UPLOAD_TO_S3;
 		}
 	}
 	

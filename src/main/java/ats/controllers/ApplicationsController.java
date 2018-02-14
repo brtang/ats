@@ -79,7 +79,6 @@ public class ApplicationsController {
 						
 						String filePath = s3utils.saveFileToLocal(new ByteArrayInputStream(file.getBytes()), file.getOriginalFilename(), appConfigUtils.getDevFilePath());
 						threadUtils.scheduleThread(newApp, listing, filePath, s3utils, fileExtension);
-//						s3utils.pushToS3(fileName, "all", listing.getLister().getCompany().getCompanyName(), listing.getId(), appConfigUtils.getDevFilePath());
 						responseMap.put(Constants.APPLICATION, newApp);
 						return new ResponseEntity<>(responseMap, HttpStatus.OK);
 					}else {

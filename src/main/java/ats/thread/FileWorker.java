@@ -16,6 +16,8 @@ import org.apache.poi.hwpf.extractor.WordExtractor;
 import ats.constants.Constants;
 import ats.database.models.Application;
 import ats.database.models.Listing;
+import ats.database.repositories.ApplicationRepository;
+import ats.utils.BeanUtil;
 import ats.utils.S3Utils;
 
 public class FileWorker implements Runnable{
@@ -71,19 +73,24 @@ public class FileWorker implements Runnable{
 		fis.close();	
 		return hasKeywords;
 	}
-
+	
 	@Override
 	public void run() {
-		Thread.currentThread().setName("BRIANS THREAD!!!");
+		Thread.currentThread().setName("Brians Thread");
 		System.out.println("Running....");
 		try {
 			File file = new File(filePath);
+			String s3Path;
 			if(parseFile(file, listing.getKeyWords())) {
-				s3Util.pushToS3(file.getName(), Constants.KEYWORD, listing.getLister().getCompany().getCompanyName(), listing.getId(), filePath);
+				s3Path = s3Util.pushToS3(file.getName(), Constants.KEYWORD, listing.getLister().getCompany().getCompanyName(), listing.getId(), filePath);
+				application.setResumePath(s3Path);
 			}else {
-				s3Util.pushToS3(file.getName(), Constants.ALL, listing.getLister().getCompany().getCompanyName(), listing.getId(), filePath);
-			}					
-			// Need to delete file from local repo 				
+				s3Path = s3Util.pushToS3(file.getName(), Constants.ALL, listing.getLister().getCompany().getCompanyName(), listing.getId(), filePath);	
+			}			
+			ApplicationRepository applicationRepository = BeanUtil.getBean(ApplicationRepository.class);
+			application.setResumePath(s3Path);	
+			applicationRepository.save(application);
+			file.delete();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
