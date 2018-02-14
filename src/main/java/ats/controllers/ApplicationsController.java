@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.io.FilenameUtils;
 import org.aspectj.lang.annotation.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -63,24 +64,29 @@ public class ApplicationsController {
 			User user = userRepository.findByUsername(username);
 			if(user != null) {
 				Listing listing = listingRepository.findById(listingId);
-				if(listing != null && listing.isActive()) {
-					Application newApp = new Application();
-					newApp.setUser(user);
-					newApp.setListing(listing);
-					applicationRepository.save(newApp);
-					
+				if(listing != null && listing.isActive()) {					
 					MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) req; 
 					Map<String, MultipartFile> files = multiRequest.getFileMap(); 
 					MultipartFile file = new ArrayList<Entry<String, MultipartFile>>(files.entrySet()).get(0).getValue(); 
-					String filePath = s3utils.saveFileToLocal(new ByteArrayInputStream(file.getBytes()), file.getOriginalFilename(), appConfigUtils.getDevFilePath());
 					
-					// To Do: Check for extensions: docx, doc, pdf
-					
-					threadUtils.scheduleThread(newApp, listing, filePath, s3utils);
-//					s3utils.pushToS3(fileName, "all", listing.getLister().getCompany().getCompanyName(), listing.getId(), appConfigUtils.getDevFilePath());
-					
-					responseMap.put(Constants.APPLICATION, newApp);
-					return new ResponseEntity<>(responseMap, HttpStatus.OK);
+					// Returns empty string if file does not have extension
+					String fileExtension = FilenameUtils.getExtension(file.getOriginalFilename());
+					if(Constants.VALID_FILE_TYPES.contains(fileExtension)) {
+						Application newApp = new Application();
+						newApp.setUser(user);
+						newApp.setListing(listing);
+						applicationRepository.save(newApp);
+						
+						String filePath = s3utils.saveFileToLocal(new ByteArrayInputStream(file.getBytes()), file.getOriginalFilename(), appConfigUtils.getDevFilePath());
+						threadUtils.scheduleThread(newApp, listing, filePath, s3utils, fileExtension);
+//						s3utils.pushToS3(fileName, "all", listing.getLister().getCompany().getCompanyName(), listing.getId(), appConfigUtils.getDevFilePath());
+						responseMap.put(Constants.APPLICATION, newApp);
+						return new ResponseEntity<>(responseMap, HttpStatus.OK);
+					}else {
+						// Invalid file type
+						responseMap.put(Constants.ERRORS, Errors.INVALID_FILE_UPLOAD);
+						return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
+					}			
 				}else {
 					// Listing not found or is not active
 					responseMap.put(Constants.ERRORS, Errors.LISTING_NOT_FOUND);
@@ -95,8 +101,7 @@ public class ApplicationsController {
 			e.printStackTrace();
 			responseMap.put(Constants.ERRORS, Errors.INTERNAL_ERROR);
 			return new ResponseEntity<>(responseMap, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		
+		}	
 	}
 	
 	

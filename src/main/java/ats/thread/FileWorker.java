@@ -3,12 +3,17 @@ package ats.thread;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
+import org.apache.poi.hwpf.HWPFDocument;
+import org.apache.poi.hwpf.extractor.WordExtractor;
 
+import ats.constants.Constants;
 import ats.database.models.Application;
 import ats.database.models.Listing;
 import ats.utils.S3Utils;
@@ -23,22 +28,20 @@ public class FileWorker implements Runnable{
 	
 	private S3Utils s3Util;
 	
-	public FileWorker(Application application, Listing listing, String filePath, S3Utils s3Util) {
+	private String fileExtension;
+	
+	public FileWorker(Application application, Listing listing, String filePath, S3Utils s3Util, String fileExtension) {
 		this.application = application;
 		this.listing = listing;
 		this.filePath = filePath;
 		this.s3Util = s3Util;
+		this.fileExtension = fileExtension;
 	}
-
-	@Override
-	public void run() {
-		Thread.currentThread().setName("BRIANS THREAD!!!");
-		System.out.println("Running....");
-		try {
-			boolean hasKeywords = false;
-			List<String> keyWords = listing.getKeyWords();
-			File file = new File(filePath);
-			FileInputStream fis = new FileInputStream(file.getAbsolutePath());
+	
+	public boolean parseFile(File file, List<String> keyWords) throws IOException {
+		boolean hasKeywords = false;
+		FileInputStream fis = new FileInputStream(file.getAbsolutePath());
+		if(fileExtension.equals("docx")) {
 			XWPFDocument document = new XWPFDocument(fis);
 			List<XWPFParagraph> paragraphs = document.getParagraphs();
 			for (XWPFParagraph para : paragraphs) {
@@ -46,23 +49,41 @@ public class FileWorker implements Runnable{
 				System.out.println(line);
 				for(String keyWord : keyWords) {
 					if(StringUtils.containsIgnoreCase(line, keyWord)) {
-						System.out.println("Line encountered keyword: " + keyWord + " " + line);
 						hasKeywords = true;
 					}
 				}
 			}
-			fis.close();
-			
-			if(hasKeywords) {
-				s3Util.pushToS3(file.getName(), "keywords", listing.getLister().getCompany().getCompanyName(), listing.getId(), filePath);
-			}else {
-				s3Util.pushToS3(file.getName(), "all", listing.getLister().getCompany().getCompanyName(), listing.getId(), filePath);
+			document.close();
+		}else if(fileExtension.equals("doc")) {
+			HWPFDocument document = new HWPFDocument(fis);
+			WordExtractor we = new WordExtractor(document);
+			String[] lines = we.getParagraphText();
+			for(String line : lines) {
+				System.out.println(line);
+				for(String keyWord : keyWords) {
+					if(StringUtils.containsIgnoreCase(line, keyWord)) {
+						hasKeywords = true;
+					}
+				}
 			}
-			
-			
-			// Need to delete file from local repo 
-			
-			
+			we.close();			
+		}		
+		fis.close();	
+		return hasKeywords;
+	}
+
+	@Override
+	public void run() {
+		Thread.currentThread().setName("BRIANS THREAD!!!");
+		System.out.println("Running....");
+		try {
+			File file = new File(filePath);
+			if(parseFile(file, listing.getKeyWords())) {
+				s3Util.pushToS3(file.getName(), Constants.KEYWORD, listing.getLister().getCompany().getCompanyName(), listing.getId(), filePath);
+			}else {
+				s3Util.pushToS3(file.getName(), Constants.ALL, listing.getLister().getCompany().getCompanyName(), listing.getId(), filePath);
+			}					
+			// Need to delete file from local repo 				
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -22,8 +22,8 @@ public class ThreadUtils {
 		threadExecutor = Executors.newFixedThreadPool(15);
 	}
 	
-	public void scheduleThread(Application application, Listing listing, String filePath, S3Utils s3Util) {
-		Runnable worker = new FileWorker(application, listing, filePath, s3Util);
+	public void scheduleThread(Application application, Listing listing, String filePath, S3Utils s3Util, String fileExtension) {
+		Runnable worker = new FileWorker(application, listing, filePath, s3Util, fileExtension);
 		threadExecutor.execute(worker);
 	}
 }

@@ -13,6 +13,11 @@ public class Constants {
 		add("0:0:0:0:0:0:0:1");
 	}};
 	
+	public static final Set<String> VALID_FILE_TYPES = new HashSet<String>() {{
+		add("docx");
+		add("doc");
+	}};
+	
 	public static final String ERRORS = "Errors";
 
 	public static final String LISTING = "Listing";
@@ -24,5 +29,11 @@ public class Constants {
 	public static final String USER = "User";
 
 	public static final String APPLICATION = "Application";	
+	
+	public static final String ALL = "all";
+	
+	public static final String KEYWORD = "keyword";
+	
+	public static final String EMPTY_STRING = "";
 	
 }
