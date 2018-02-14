@@ -93,8 +93,7 @@ public class FileWorker implements Runnable{
 			file.delete();
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
-			
+		}			
 	}
 
 }

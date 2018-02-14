@@ -19,9 +19,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import ats.constants.Constants;
 import ats.constants.Errors;
+import ats.database.models.Application;
 import ats.database.models.Company;
 import ats.database.models.Lister;
 import ats.database.models.Listing;
+import ats.database.repositories.ApplicationRepository;
 import ats.database.repositories.CompaniesRepository;
 import ats.database.repositories.ListersRepository;
 import ats.database.repositories.ListingsRepository;
@@ -40,6 +42,9 @@ public class ListingsController {
 	
 	@Autowired
 	private ListersRepository listerRepository;
+	
+	@Autowired
+	private ApplicationRepository applicationRepository;
 	
 	// TO DO: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// A lot of repetitive code that can be placed in an interceptor?
@@ -156,6 +161,43 @@ public class ListingsController {
 				responseMap.put(Constants.ERRORS, Errors.COMPANY_NOT_FOUND);
 				return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);	
 			}						
+		}catch(Exception e) {
+			e.printStackTrace();
+			responseMap.put(Constants.ERRORS, Errors.INTERNAL_ERROR);
+			return new ResponseEntity<>(responseMap, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	// GET all applications by listingId
+	@RequestMapping(value = "/listing/{listingId}/applications", method = RequestMethod.GET)
+	public ResponseEntity<Object> getApplicationsForListing(HttpServletRequest req, @PathVariable("companyName") String companyName, @PathVariable("listingId") int listingId){
+		Map<String, Object> responseMap = new HashMap<String, Object>();
+		try {
+			// To Do: Store secret key in properties
+			if(req.getHeader("secretKey") == null || !req.getHeader("secretKey").equals("this")) {
+				// Log this attempt
+				System.out.println("WRONG SECRET KEY");
+				return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);		
+			}
+			Company company = companyRepository.findByCompanyName(companyName);	
+			if(company != null) {
+				// Find by listingId and Company
+				Listing listing = listingsRepository.findByCompanyAndId(companyName, listingId);
+				if(listing != null) {
+					List<Application> applications = applicationRepository.findByListingId(listingId);
+					responseMap.put(Constants.APPLICATION, applications);
+					return new ResponseEntity<>(responseMap, HttpStatus.OK);
+				}else {
+					// Listing not found
+					responseMap.put(Constants.ERRORS, Errors.LISTING_NOT_FOUND);
+					return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
+				}
+			
+			}else {
+				// Company does not exist
+				responseMap.put(Constants.ERRORS, Errors.COMPANY_NOT_FOUND);
+				return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);	
+			}			
 		}catch(Exception e) {
 			e.printStackTrace();
 			responseMap.put(Constants.ERRORS, Errors.INTERNAL_ERROR);
