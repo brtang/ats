@@ -20,4 +20,7 @@ public interface ListingsRepository extends CrudRepository<Listing, Serializable
 	
 	@Query("select l from Listing l where l.lister.companyName.companyName = :companyName and l.id = :id")
 	Listing findByCompanyAndId(@Param("companyName") String companyName, @Param("id") int id);
+	
+	@Query("select l from Listing l where l.lister.username = :username and l.id = :id")
+	Listing findByUsernameAndId(@Param("username") String username, @Param("id") int id);
 }
