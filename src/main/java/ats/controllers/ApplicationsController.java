@@ -88,8 +88,10 @@ public class ApplicationsController {
 						newApp.setListing(listing);
 						applicationRepository.save(newApp);
 						
+						// TO DO: Need to format fileName to include username_filename.docx
+						
 						String filePath = s3utils.saveFileToLocal(new ByteArrayInputStream(file.getBytes()), file.getOriginalFilename(), appConfigUtils.getDevFilePath());
-						threadUtils.scheduleThread(newApp, listing, filePath, s3utils, fileExtension);
+						threadUtils.scheduleFileWorker(newApp, listing, filePath, s3utils, fileExtension);
 						responseMap.put(Constants.APPLICATION, newApp);
 						return new ResponseEntity<>(responseMap, HttpStatus.OK);
 					}else {
@@ -131,12 +133,17 @@ public class ApplicationsController {
 				if(lister != null) {
 					Listing listing = listingRepository.findByUsernameAndId(username, listingId);
 					if(listing != null) {
-						Application application = applicationRepository.findOne(appId);
+						Application application = applicationRepository.findOne(appId); // Check if resume path exists?
 						if(application != null) {
 							if(req.getHeader("location") != null){
 								try {
-									AppLocation l = Enum.valueOf(AppLocation.class, req.getHeader("location").toUpperCase());
-									responseMap.put("appLocation", l);
+									AppLocation appLocation = Enum.valueOf(AppLocation.class, req.getHeader("location").toUpperCase());
+									
+									System.out.println(application.getResumePath());
+									
+									threadUtils.scheduleFileMover(s3utils, appLocation, application.getResumePath());
+									
+									responseMap.put("appLocation", appLocation);
 									return new ResponseEntity<>(responseMap, HttpStatus.OK);
 								}catch(IllegalArgumentException e) {
 									// Invalid appLocation enum

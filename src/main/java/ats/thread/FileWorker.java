@@ -76,7 +76,7 @@ public class FileWorker implements Runnable{
 	
 	@Override
 	public void run() {
-		Thread.currentThread().setName("Brians Thread");
+		Thread.currentThread().setName("FileWorker Thread");
 		System.out.println("Running....");
 		try {
 			File file = new File(filePath);

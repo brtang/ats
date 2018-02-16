@@ -58,7 +58,25 @@ public class S3Utils {
 		} 
 	}
 	
-	
+	public boolean moveDirectory(String location, String newLocation) {
+		try {	
+			logger.info("Attempting to connect to S3 client.");
+			MinioClient minioClient = new MinioClient(appConfigUtils.getS3Port(), appConfigUtils.getS3AccessKeyID(), appConfigUtils.getS3SecretAccessKey());
+			logger.info("Successfully connected to S3 client.");
+			boolean isExist = minioClient.bucketExists(appConfigUtils.getS3Bucket());
+			if(!isExist) {
+				minioClient.makeBucket(appConfigUtils.getS3Bucket());
+				logger.info(appConfigUtils.getS3Bucket() + " created.");
+			}
+			minioClient.copyObject(appConfigUtils.getS3Bucket(), location, appConfigUtils.getS3Bucket(), newLocation);
+			minioClient.removeObject(appConfigUtils.getS3Bucket(), location);
+			logger.info("Successfully copied object from: " + location + " to: " + newLocation);
+			return true;
+		}catch(Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
 	
 
 }
