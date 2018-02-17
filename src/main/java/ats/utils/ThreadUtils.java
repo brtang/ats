@@ -5,6 +5,8 @@ import java.util.concurrent.Executors;
 
 import javax.annotation.PostConstruct;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import ats.constants.AppLocation;
@@ -15,6 +17,7 @@ import ats.thread.FileWorker;
 
 @Service
 public class ThreadUtils {
+	private static Logger logger = LoggerFactory.getLogger(ThreadUtils.class);
 	
 	private static ExecutorService threadExecutor;
 	
@@ -24,8 +27,8 @@ public class ThreadUtils {
 		threadExecutor = Executors.newFixedThreadPool(15);
 	}
 	
-	public void scheduleFileMover(S3Utils s3Util, AppLocation appLocation, String location) {
-		Runnable mover = new FileMover(s3Util, appLocation, location);
+	public void scheduleFileMover(S3Utils s3Util, AppLocation appLocation, Application application) {
+		Runnable mover = new FileMover(s3Util, appLocation, application);
 		threadExecutor.execute(mover);
 	}
 	

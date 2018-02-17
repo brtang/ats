@@ -10,6 +10,8 @@ import java.util.Map.Entry;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,6 +44,8 @@ import ats.utils.ThreadUtils;
 @Controller
 @RequestMapping("")
 public class ApplicationsController {
+	
+	private static Logger logger = LoggerFactory.getLogger(ApplicationsController.class);
 	
 	@Autowired
 	private AppConfigUtils appConfigUtils;
@@ -141,7 +145,7 @@ public class ApplicationsController {
 									
 									System.out.println(application.getResumePath());
 									
-									threadUtils.scheduleFileMover(s3utils, appLocation, application.getResumePath());
+									threadUtils.scheduleFileMover(s3utils, appLocation, application);
 									
 									responseMap.put("appLocation", appLocation);
 									return new ResponseEntity<>(responseMap, HttpStatus.OK);

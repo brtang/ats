@@ -10,6 +10,8 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.poi.hwpf.HWPFDocument;
 import org.apache.poi.hwpf.extractor.WordExtractor;
 
@@ -21,6 +23,8 @@ import ats.utils.BeanUtil;
 import ats.utils.S3Utils;
 
 public class FileWorker implements Runnable{
+	
+	private static Logger logger = LoggerFactory.getLogger(FileWorker.class);
 	
 	private Application application;
 	
