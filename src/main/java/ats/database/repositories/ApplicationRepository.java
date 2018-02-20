@@ -13,4 +13,7 @@ public interface ApplicationRepository extends CrudRepository<Application, Seria
 	
 	@Query("select a from Application a where a.listing.id = :listingId")
 	List<Application> findByListingId(@Param("listingId") int listingId);
+	
+	@Query("select a from Application a where a.user.username = :username")
+	Application findByUsername(@Param("username") String username);
 }

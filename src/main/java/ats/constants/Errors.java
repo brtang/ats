@@ -16,5 +16,6 @@ public class Errors {
 	public static final Object INVALID_FILE_UPLOAD = "Invalid file upload";
 	public static final String FAILED_TO_UPLOAD_TO_S3 = "Failed to upload to S3";
 	public static final Object APPLICATION_NOT_FOUND = "Application not found";
+	public static final Object APPLICATION_ALREADY_EXISTS = "Application already exists";
 
 }

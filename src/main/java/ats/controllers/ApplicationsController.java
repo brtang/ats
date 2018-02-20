@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +72,15 @@ public class ApplicationsController {
 	@Autowired
 	private ThreadUtils threadUtils;
 	
+	public String formatFilename(String fileName, String username) {
+		
+		String generatedString = RandomStringUtils.random(10, true, true);
+		System.out.println("Random generated string: " + generatedString);
+		fileName = generatedString + "_" + username + "_" + fileName;
+		System.out.println(fileName);
+		return fileName;
+	}
+	
 	// POST a new application
 	@RequestMapping(value = "/users/{username}/{listingId}/application", method = RequestMethod.POST)
 	public ResponseEntity<Object> createApplication(HttpServletRequest req, @PathVariable("username") String username, @PathVariable("listingId") int listingId){
@@ -79,28 +89,33 @@ public class ApplicationsController {
 			User user = userRepository.findByUsername(username);
 			if(user != null) {
 				Listing listing = listingRepository.findById(listingId);
-				if(listing != null && listing.isActive()) {					
-					MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) req; 
-					Map<String, MultipartFile> files = multiRequest.getFileMap(); 
-					MultipartFile file = new ArrayList<Entry<String, MultipartFile>>(files.entrySet()).get(0).getValue(); 
-					
-					// Returns empty string if file does not have extension
-					String fileExtension = FilenameUtils.getExtension(file.getOriginalFilename());
-					if(Constants.VALID_FILE_TYPES.contains(fileExtension)) {
-						Application newApp = new Application();
-						newApp.setUser(user);
-						newApp.setListing(listing);
-						applicationRepository.save(newApp);
+				if(listing != null && listing.isActive()) {		
+					Application application = applicationRepository.findByUsername(username);
+					if(application == null) {
+						MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) req; 
+						Map<String, MultipartFile> files = multiRequest.getFileMap(); 
+						MultipartFile file = new ArrayList<Entry<String, MultipartFile>>(files.entrySet()).get(0).getValue(); 
 						
-						// TO DO: Need to format fileName to include username_filename.docx
-						
-						String filePath = s3utils.saveFileToLocal(new ByteArrayInputStream(file.getBytes()), file.getOriginalFilename(), appConfigUtils.getDevFilePath());
-						threadUtils.scheduleFileWorker(newApp, listing, filePath, s3utils, fileExtension);
-						responseMap.put(Constants.APPLICATION, newApp);
-						return new ResponseEntity<>(responseMap, HttpStatus.OK);
+						// Returns empty string if file does not have extension
+						String fileExtension = FilenameUtils.getExtension(file.getOriginalFilename());
+						if(Constants.VALID_FILE_TYPES.contains(fileExtension)) {
+							Application newApp = new Application();
+							newApp.setUser(user);
+							newApp.setListing(listing);
+							applicationRepository.save(newApp);
+							
+							String filePath = s3utils.saveFileToLocal(new ByteArrayInputStream(file.getBytes()), formatFilename(file.getOriginalFilename(), username)/*file.getOriginalFilename()*/, appConfigUtils.getDevFilePath());
+							threadUtils.scheduleFileWorker(newApp, listing, filePath, s3utils, fileExtension);
+							responseMap.put(Constants.APPLICATION, newApp);
+							return new ResponseEntity<>(responseMap, HttpStatus.OK);
+						}else {
+							// Invalid file type
+							responseMap.put(Constants.ERRORS, Errors.INVALID_FILE_UPLOAD);
+							return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
+						}
 					}else {
-						// Invalid file type
-						responseMap.put(Constants.ERRORS, Errors.INVALID_FILE_UPLOAD);
+						// User already has submitted an Application for this listing
+						responseMap.put(Constants.ERRORS,  Errors.APPLICATION_ALREADY_EXISTS);
 						return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
 					}			
 				}else {
